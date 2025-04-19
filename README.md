@@ -22,21 +22,17 @@ Ensure these dependencies are installed in your ROS 2 environment.
 1. Clone the repository into your working directory:
    ```bash
    https://github.com/koustubh1012/enpm661_competition.git
-
 2. Build the package using Colcon build
     ```bash
     colcon build --event-handlers console_cohesion+
-
 3. Source the overlay and underlay
 
     ```bash
     source /opt/ros/jazzy/setup.bash
     source install/setup.bash
-
 4. Launch the Gazebo setup using the launch file
     ```bash
     ros2 launch enpm661_competition turtlebot4_comp.launch.py
-
 ### Docker
 
 1. To build the docker image using docker compose
@@ -46,10 +42,9 @@ Ensure these dependencies are installed in your ROS 2 environment.
 2. To make container
     ```bash
     docker compose -f docker/enpm661-comp.yml run --rm enpm661-comp-docker
-
 NOTE: use sudo inside docker just like native.
 
-### Connecting to TurtleBot4
+## Connecting to TurtleBot4
 1. Connect to same Wifi network of robot. ping and verify the connection.
 2. Setup environment in container to see topics from robot
     ```bash
