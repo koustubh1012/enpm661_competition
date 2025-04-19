@@ -53,3 +53,4 @@ ENV SHELL="/bin/bash"
 WORKDIR /home/$USERNAME/comp_ws
 USER $USERNAME
 ENTRYPOINT [ "/ros_entrypoint.sh", "/home/docker_user/enpm661_comp_entrypoint.sh" ]
+CMD [ "bash" ]

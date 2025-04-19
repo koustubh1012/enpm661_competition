@@ -1,0 +1,25 @@
+services:
+  enpm661-comp-docker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.enpm661_comp
+      args:
+        - USERNAME=${USERNAME_DOCKER}
+        - USER_UID=${USERUID}
+        - USER_GID=${USERGID}
+    container_name: enpm661-comp-container
+    environment:
+      - DISPLAY=$DISPLAY
+      - QT_X11_NO_MITSHM=1
+    image: test:1
+    # Required for communicating over the network
+    network_mode: "host"
+    ipc: "host"
+    pid: "host"
+    # Required for accessing hardware
+    privileged: true
+    volumes:
+      - ../src:/home/${USERNAME_DOCKER}/comp_ws/src
+      - ../config:/home/${USERNAME_DOCKER}/config
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
