@@ -1,0 +1,55 @@
+FROM ros:jazzy
+ARG USERNAME=docker_user
+ARG USER_UID=1000
+ARG USER_GID=1000
+ARG HOME=/home/${USERNAME}
+
+# Delete user if it exists in container (e.g Ubuntu Noble: ubuntu)
+RUN if id -u ${USER_UID} ; then userdel `id -un ${USER_UID}` && rm -rf /home/* ; fi
+
+# Create the user
+RUN groupadd --gid ${USER_GID} $USERNAME \
+    && useradd --uid ${USER_UID} --gid ${USER_GID} -m $USERNAME \
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+#installing deps
+COPY docker/requirements.txt /tmp/requirements.txt
+RUN apt-get update && apt-get install --no-install-recommends $(grep -vE "^\s*#" /tmp/requirements.txt  | tr "\n" " ") -y && apt-get clean && rm -rf /var/lib/apt/lists && rm /tmp/requirements.txt
+
+# installing Gazebo Harmonic
+RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+RUN apt-get update && apt-get install gz-harmonic -y
+
+# clone the repo
+WORKDIR ${HOME}/comp_ws/
+COPY src ${HOME}/comp_ws/src
+
+# install ros dependencies
+RUN apt-get update && rosdep update && rosdep install -y --from-paths src --ignore-src && rm -rf /var/lib/apt/lists/*
+
+# build the workspace
+RUN . /opt/ros/jazzy/setup.sh && \
+    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -G Ninja --event-handlers console_cohesion+ && \
+    rm -rf /var/lib/apt/lists/*
+
+# downloading the discovery script
+RUN wget -qO - https://raw.githubusercontent.com/turtlebot/turtlebot4_setup/jazzy/turtlebot4_discovery/configure_discovery.sh
+COPY docker/enpm661_comp_entrypoint.sh ${HOME}/
+RUN chmod +x ${HOME}/enpm661_comp_entrypoint.sh
+
+
+RUN chown -R $USERNAME:$USERNAME ${HOME}
+
+
+RUN echo 'source /opt/ros/jazzy/setup.bash' >> $HOME/.bashrc && \
+    echo 'source /usr/share/colcon_cd/function/colcon_cd.sh' >> $HOME/.bashrc && \
+    echo 'source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash' >> $HOME/.bashrc
+
+ENV SHELL="/bin/bash"
+WORKDIR /home/$USERNAME/comp_ws
+USER $USERNAME
+ENTRYPOINT [ "/ros_entrypoint.sh", "/home/docker_user/enpm661_comp_entrypoint.sh" ]
