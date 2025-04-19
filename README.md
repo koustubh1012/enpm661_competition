@@ -18,23 +18,28 @@ Ensure these dependencies are installed in your ROS 2 environment.
 
 ## Installation and Launching Gazebo
 
-1. Clone the repository into your ROS 2 workspace:
+### Native ROS-jazzy install
+1. Clone the repository into your working directory:
    ```bash
    https://github.com/koustubh1012/enpm661_competition.git
 
-2. Build rhe package using Colcon build
+2. Build the package using Colcon build
     ```bash
-    colcon build
+    colcon build --event-handlers console_cohesion+
 
 3. Source the overlay and underlay
 
     ```bash
     source /opt/ros/jazzy/setup.bash
-    source install/setup/bash
+    source install/setup.bash
 
 4. Launch the Gazebo setup using the launch file
     ```bash
-    ros2 launch enpm661_competition turtlebot4_gz.launch.py
+    ros2 launch enpm661_competition turtlebot4_comp.launch.py
+
+### Docker
+
+
 
 ## Autonomous Navigation
 

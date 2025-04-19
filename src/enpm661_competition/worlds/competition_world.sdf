@@ -19,14 +19,14 @@
     <include>
       <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun</uri>
     </include>
- 
+
     <!-- Included model -->
     <include>
       <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
     </include>
 
     <include>
-      <uri>models://project3</uri>
+      <uri>model://project3</uri>
       <pose>0 1.5 0 0 0 0</pose>
     </include>
 

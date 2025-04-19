@@ -1,0 +1,14 @@
+vim
+nano
+wget
+git
+curl
+iputils-ping
+ninja-build
+python3-pip
+python3-setuptools
+ros-jazzy-plotjuggler-ros
+ros-jazzy-plotjuggler
+python3-colcon-clean
+lsb-release
+gnupg

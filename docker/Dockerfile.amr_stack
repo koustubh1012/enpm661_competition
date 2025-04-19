@@ -1,0 +1,59 @@
+# copyright Copyright (c) 2024, NHRSL, All rights reserved.
+# Copyright Misuse Disclaimer
+# All rights reserved. The content, including but not limited to text, graphics, images, and other material
+# contained on this site, is protected by copyright and intellectual property laws. Unauthorized use and/or
+# duplication of this material without express and written permission from Novus Hitech Robotic Systemz Pvt Ltd.
+# is strictly prohibited.
+# Caution to Unauthorized Users
+# You are hereby notified that any dissemination, distribution, or copying of this content without proper
+# authorisation from Novus Hitech Robotic Systemz Pvt Ltd. is strictly prohibited and may be unlawful.
+# If you do not have express permission from the rightful copyright owner, Novus Hitech Robotic Systemz Pvt Ltd.,
+# to use this content, you must not use, reproduce, distribute, transmit, display, perform, or create derivative
+# works based on the material in any manner whatsoever.
+# Please respect intellectual property rights and refrain from unauthorised use. Violations could be subject to legal action.
+#  1.x.x - 10.x.x is based on ros:noetic intended for non cuda systems
+#  11.x.x - 20.x.x is based on jetpack intended for Jetson series
+
+ARG BASE_IMAGE=thrsl:amr_core
+FROM ${BASE_IMAGE} as stack-compiler
+ENV DEBIAN_FRONTEND=noninteractive
+ENV HOME "/home/nuc"
+ARG ROS_DIR=${HOME}/amr_ws
+WORKDIR ${HOME}/amr_ws
+COPY novus-universe/ai ${HOME}/amr_ws/src/novus_drive_amr/ai
+COPY novus-universe/application ${HOME}/amr_ws/src/novus_drive_amr/application
+COPY novus-universe/ewi ${HOME}/amr_ws/src/novus_drive_amr/ewi
+COPY novus-universe/ikr ${HOME}/amr_ws/src/novus_drive_amr/ikr
+COPY novus-universe/messaging ${HOME}/amr_ws/src/novus_drive_amr/messaging
+USER root
+RUN chown -R nuc:nuc ${HOME}
+USER nuc
+WORKDIR ${HOME}/amr_ws
+RUN /ros_entrypoint.sh catkin config --init --install --skiplist novus_telemetry qr_localizer detection obstacle_detection_2d teb_local_planner cartographer_ros cartographer_rviz --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=14  && /ros_entrypoint.sh catkin build -j10 -sc --no-status --force-color
+
+FROM ${BASE_IMAGE} as amr-build
+ARG VERSION="v0.0.0"
+ARG TAG="v0.0.0"
+ARG MAINTAINER="NHRSL"
+RUN test -n "$VERSION"
+RUN test -n "$TAG"
+RUN test -n "$MAINTAINER"
+LABEL org.NHRSL.git.tag="$VERSION"
+LABEL org.NHRSL.build.tag="$TAG"
+LABEL org.NHRSL.image.maintainer="$MAINTAINER"
+ENV DEBIAN_FRONTEND=noninteractive
+ENV HOME "/home/nuc"
+ARG ROS_DIR=${HOME}/amr_ws
+WORKDIR ${HOME}/amr_ws
+COPY build_tools/docker/amr_stack_entrypoint.sh ${HOME}/amr_stack_entrypoint.sh
+COPY build_tools/assests/start_ui.sh ${HOME}/start_ui.sh
+WORKDIR ${HOME}/amr_ws/certs/UI
+RUN openssl req -x509 -nodes -days 365 -nodes\
+    -subj "/C=IN/ST=HR/O=NHRSL" \
+    -newkey rsa:2048 -keyout ${PWD}/self.key \
+    -out ${PWD}/self.crt && openssl dhparam -out ${PWD}/dhparam.pem 2048;
+COPY --from=stack-compiler /home/nuc/amr_ws/install /home/nuc/amr_ws/install
+RUN chown -R nuc:nuc ${HOME}
+USER nuc
+WORKDIR ${HOME}/amr_ws
+ENTRYPOINT ["/ros_entrypoint.sh", "/home/nuc/amr_stack_entrypoint.sh"]

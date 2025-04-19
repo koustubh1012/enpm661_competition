@@ -25,64 +25,70 @@ from launch.actions import SetEnvironmentVariable
 import os
 
 world = os.path.join(
-        get_package_share_directory('enpm661_competition'),
-        'worlds',
-        'competition_world'
-    )
+    get_package_share_directory("enpm661_competition"), "worlds", "competition_world"
+)
 
-model_path = os.path.join(
-        get_package_share_directory('enpm661_competition'), 'models'
-    )
-    
+model_path = os.path.join(get_package_share_directory("enpm661_competition"), "models")
+
 set_gazebo_model_path = SetEnvironmentVariable(
-    name='GAZEBO_MODEL_PATH', value=model_path
+    name="GAZEBO_MODEL_PATH", value=model_path
 )
 
 
 ARGUMENTS = [
-    DeclareLaunchArgument('namespace', default_value='',
-                          description='Robot namespace'),
-    DeclareLaunchArgument('rviz', default_value='false',
-                          choices=['true', 'false'], description='Start rviz.'),
-    DeclareLaunchArgument('world', default_value=world,
-                          description='Simulation World'),
-    DeclareLaunchArgument('model', default_value='standard',
-                          choices=['standard', 'lite'],
-                          description='Turtlebot4 Model'),
+    DeclareLaunchArgument("namespace", default_value="", description="Robot namespace"),
+    DeclareLaunchArgument(
+        "rviz",
+        default_value="false",
+        choices=["true", "false"],
+        description="Start rviz.",
+    ),
+    DeclareLaunchArgument("world", default_value=world, description="Simulation World"),
+    DeclareLaunchArgument(
+        "model",
+        default_value="standard",
+        choices=["standard", "lite"],
+        description="Turtlebot4 Model",
+    ),
 ]
 
-for pose_element in ['x', 'y', 'z', 'yaw']:
-    ARGUMENTS.append(DeclareLaunchArgument(pose_element, default_value='0.0',
-                     description=f'{pose_element} component of the robot pose.'))
+for pose_element in ["x", "y", "z", "yaw"]:
+    ARGUMENTS.append(
+        DeclareLaunchArgument(
+            pose_element,
+            default_value="0.0",
+            description=f"{pose_element} component of the robot pose.",
+        )
+    )
 
 
 def generate_launch_description():
     # Directories
-    pkg_turtlebot4_gz_bringup = get_package_share_directory(
-        'enpm661_competition')
+    pkg_turtlebot4_gz_bringup = get_package_share_directory("enpm661_competition")
 
     # Paths
     gazebo_launch = PathJoinSubstitution(
-        [pkg_turtlebot4_gz_bringup, 'launch', 'sim.launch.py'])
+        [pkg_turtlebot4_gz_bringup, "launch", "sim.launch.py"]
+    )
     robot_spawn_launch = PathJoinSubstitution(
-        [pkg_turtlebot4_gz_bringup, 'launch', 'turtlebot4_spawn.launch.py'])
+        [pkg_turtlebot4_gz_bringup, "launch", "turtlebot4_spawn.launch.py"]
+    )
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gazebo_launch]),
-        launch_arguments=[
-            ('world', LaunchConfiguration('world'))
-        ]
+        launch_arguments=[("world", LaunchConfiguration("world"))],
     )
 
     robot_spawn = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([robot_spawn_launch]),
         launch_arguments=[
-            ('namespace', LaunchConfiguration('namespace')),
-            ('rviz', LaunchConfiguration('rviz')),
-            ('x', LaunchConfiguration('x')),
-            ('y', LaunchConfiguration('y')),
-            ('z', LaunchConfiguration('z')),
-            ('yaw', LaunchConfiguration('yaw'))]
+            ("namespace", LaunchConfiguration("namespace")),
+            ("rviz", LaunchConfiguration("rviz")),
+            ("x", LaunchConfiguration("x")),
+            ("y", LaunchConfiguration("y")),
+            ("z", LaunchConfiguration("z")),
+            ("yaw", LaunchConfiguration("yaw")),
+        ],
     )
 
     # Create launch description and add actions

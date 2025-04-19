@@ -15,7 +15,7 @@ find_package(tf2 REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 install(
-  DIRECTORY launch worlds
+  DIRECTORY launch worlds models
   DESTINATION share/${PROJECT_NAME}
 )
 
