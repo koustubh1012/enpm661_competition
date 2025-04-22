@@ -62,7 +62,7 @@ def generate_launch_description():
     gz_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
         value=':'.join([
-            os.path.join(pkg_turtlebot4_gz_bringup, 'worlds/models'),
+            os.path.join(pkg_turtlebot4_gz_bringup, 'models'),
             os.path.join(pkg_irobot_create_gz_bringup, 'worlds'),
             str(Path(pkg_turtlebot4_description).parent.resolve()),
             str(Path(pkg_irobot_create_description).parent.resolve())

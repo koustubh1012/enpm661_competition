@@ -208,8 +208,8 @@ def generate_launch_description():
             executable='static_transform_publisher',
             output='screen',
             arguments=[
-                '0', '0', '0', '0', '0', '0.0',
-                'rplidar_link', [robot_name, '/rplidar_link/rplidar']],
+                '--x 0', '--y 0', '--z 0', '--roll 0', '--pitch 0', '--yaw 0.0',
+                '--frame-id rplidar_link','--child-frame-id', [robot_name, '/rplidar_link/rplidar']],
             remappings=[
                 ('/tf', 'tf'),
                 ('/tf_static', 'tf_static'),
@@ -224,9 +224,9 @@ def generate_launch_description():
             executable='static_transform_publisher',
             output='screen',
             arguments=[
-                '0', '0', '0',
-                '1.5707', '-1.5707', '0',
-                'oakd_rgb_camera_optical_frame',
+                '--x 0', '--y 0', '--z 0',
+                '--roll 1.5707', '--pitch -1.5707', '--yaw 0',
+                '--frame-id oakd_rgb_camera_optical_frame', '--child-frame-id',
                 [robot_name, '/oakd_rgb_camera_frame/rgbd_camera']
             ],
             remappings=[
