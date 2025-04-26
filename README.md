@@ -37,11 +37,11 @@ Ensure these dependencies are installed in your ROS 2 environment.
 
 1. To build the docker image using docker compose
     ```bash
-    USERUID=$(id -u) USERGID=$(id -g) docker compose -f docker/enpm661-comp.yml build
+    USERNAME_DOCKER=docker_user USERUID=$(id -u) USERGID=$(id -g) docker compose -f docker/enpm661-comp.yml build
 
 2. To make container
     ```bash
-    docker compose -f docker/enpm661-comp.yml run --rm enpm661-comp-docker
+    USERNAME_DOCKER=docker_user USERUID=$(id -u) USERGID=$(id -g) docker compose -f docker/enpm661-comp.yml run --rm enpm661-comp-docker
 NOTE: use sudo inside docker just like native.
 
 ## Connecting to TurtleBot4
@@ -79,6 +79,12 @@ Example to teleop TB4 with namespace tb4_1
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true -r /cmd_vel:=/tb4_1/cmd_vel
 ```
+### Resetting odom
+To reset the odom and odom $\rightarrow$ base_link tf
+```bash
+ros2 service call /tb4_1/reset_pose irobot_create_msgs/srv/ResetPose "{pose: {position: {x: 0.0, y: 0.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}"
+```
+
 
 ## Autonomous Navigation
 
